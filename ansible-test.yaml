@@ -1,0 +1,49 @@
+---
+- name: Ansible playbook to host a website
+  hosts: localhost
+  tasks:
+    - name: Deploy prequisites
+      become: true
+      yum: name=firewalld state=present
+
+    - name: Start firewalld
+      become: true
+      service: name=firewalld state=started enabled=yes
+
+    - name: Install a database service
+      become: true
+      yum:
+        name:
+        - mariadb-server
+        - MySQL-python
+        state: present
+
+    - name: Start mariadb service
+      become: true
+      service: name=mariadb state=started enabled=yes
+
+    - name: Configure firewall for database
+      become: true
+      firewalld:
+        zone: public
+        port: 3306/tcp
+        permanent: yes
+        state: enabled
+
+    - name: Firewalld reload
+      become: true
+      command: firewall-cmd --reload
+
+    - name: Create a new database
+      become: true
+      mysql_db:
+        name: ecomdb
+        state: present
+
+    - name: Create a mysql user
+      become: true
+      mysql_user:
+        name: ecomuser
+        password: ecompassword
+        priv: '*.*:ALL,GRANT'
+        state: present

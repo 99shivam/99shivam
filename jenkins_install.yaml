@@ -1,0 +1,44 @@
+---
+- name: Playbook to install Jenkins
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Yum upgrade
+      yum:
+        name: '*'
+        state: latest
+
+    - name: Install latest epm-release
+      yum:
+        name:
+          - epel-release
+          - java-11-openjdk-devel
+          - python-pip
+        state: present
+
+    - name: Register Certificates
+      command:  'pip install --upgrade certifi'
+
+    - name: Download Jenkins repo
+      get_url:
+        url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+
+    - name: Register key for repos
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+    - name: Install Jenkins
+      yum:
+        name: jenkins
+        state:  present
+
+    - name: Systemctl reload
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: Start jenkins
+      service:
+        name: jenkins
+        state: started
