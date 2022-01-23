@@ -29,7 +29,7 @@
         state: present
         key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
 
-    - name: Install Jenkins
+    - name: Installed Jenkins
       yum:
         name: jenkins
         state:  present
