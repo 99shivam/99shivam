@@ -3,7 +3,7 @@
   hosts: localhost
   become: true
   tasks:
-    - name: Yum upgrade
+    - name: Yum upgrade web
       yum:
         name: '*'
         state: latest
